@@ -6,6 +6,7 @@ const routes = [
     { path: "/", component: Home },
     { path: "/post/:id", component: Blog, props: true, name: "SingleBlog" },
 ];
+
 const router = createRouter({
     history: createWebHistory(),
     routes,

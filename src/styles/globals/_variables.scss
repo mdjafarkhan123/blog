@@ -1,0 +1,51 @@
+:root {
+    --color-primary: #514dcc;
+    --color-secondary: #a6dcef;
+    --color-accent: #f39c12;
+
+    --color-heading: #000000;
+    --color-subheading: #808080;
+    --color-body-text: #535353;
+    --color-background: #f7f9fc;
+    --color-white: white;
+    --color-offWhite: rgb(236, 236, 236);
+    --color-hover: #004494;
+    --color-success: #28a745;
+    --color-error: #dc3545;
+    --color-warning: #ffc107;
+    --color-border: #dedede;
+
+    /*=========== Font size =======*/
+    /* fs xsm: 12.5px → 14.08px */
+    --fs-xsm: clamp(0.7813rem, 0.7342rem + 0.1881vw, 0.88rem);
+    /* fs sm: 15px → 17.6px */
+    --fs-sm: clamp(0.9375rem, 0.8601rem + 0.3095vw, 1.1rem);
+    /* fs md: 18px → 22px */
+    --fs-md: clamp(1.125rem, 1.006rem + 0.4762vw, 1.375rem);
+    /* fs lg: 21.6px → 27.5px */
+    --fs-lg: clamp(1.35rem, 1.1744rem + 0.7024vw, 1.7188rem);
+    /* fs xl: 25.92px → 34.375px */
+    --fs-xl: clamp(1.62rem, 1.3684rem + 1.0065vw, 2.1484rem);
+    /* fs xxl: 31.104px → 42.9688px */
+    --fs-xxl: clamp(1.944rem, 1.5909rem + 1.4125vw, 2.6855rem);
+    /* fs 2xl: 37.3248px → 53.7109px */
+    --fs-2xl: clamp(2.3328rem, 1.8451rem + 1.9507vw, 3.3569rem);
+
+    /*=========== Spacing =======*/
+    --space-3xs-2xs: clamp(0.3125rem, 0.1339rem + 0.7143vw, 0.6875rem);
+    --space-2xs-xs: clamp(0.5625rem, 0.3244rem + 0.9524vw, 1.0625rem);
+    --space-xs-s: clamp(0.875rem, 0.6369rem + 0.9524vw, 1.375rem);
+    --space-s-m: clamp(1.125rem, 0.6786rem + 1.7857vw, 2.0625rem);
+    --space-m-l: clamp(1.6875rem, 1.1815rem + 2.0238vw, 2.75rem);
+    --space-l-xl: clamp(2.25rem, 1.3571rem + 3.5714vw, 4.125rem);
+    --space-xl-2xl: clamp(3.375rem, 2.3631rem + 4.0476vw, 5.5rem);
+}
+
+[data-theme="dark"] {
+    --color-heading: #f5f5f5; /* Black */
+    --color-subheading: #d7d7d7; /* Gray */
+    --color-body-text: #efefef; /* Dark Gray */
+    --color-background: #131313; /* Off-White */
+    --color-white: rgb(14, 14, 14);
+    --color-border: #7b7b7bc4; /* Light Gray */
+}

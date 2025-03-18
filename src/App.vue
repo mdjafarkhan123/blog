@@ -1,11 +1,17 @@
-<script setup></script>
+<script setup>
+import Footer from "./components/Footer.vue";
+import Header from "./components/Header.vue";
+Footer;
+</script>
 
 <template>
-    <router-view v-slot="{ Component }">
-        <keep-alive exclude="Blog">
+    <Header></Header>
+    <main>
+        <router-view v-slot="{ Component }">
             <component :is="Component"></component>
-        </keep-alive>
-    </router-view>
+        </router-view>
+    </main>
+    <Footer></Footer>
 </template>
 
 <style lang="scss" scoped></style>

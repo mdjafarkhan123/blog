@@ -21,7 +21,7 @@ body {
     font-family: "DM Sans", "Helvetica", sans-serif;
     line-height: 1.6;
     background-color: var(--color-background);
-    color: var(--color-text);
+    color: var(--color-body-text);
 }
 
 h1,
@@ -41,12 +41,29 @@ blockquote {
     padding: 0;
 }
 
+h1 {
+    font-size: var(--fs-2xl);
+}
+h2 {
+    font-size: var(--fs-xxl);
+}
+h3 {
+    font-size: var(--fs-xl);
+}
+h4 {
+    font-size: var(--fs-md);
+}
+h5 {
+    font-size: var(--fs-xsm);
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
+    color: var(--color-heading);
     line-height: 1.2;
     text-wrap: balance;
 }
@@ -131,14 +148,16 @@ textarea {
 
 .btn {
     display: inline-block;
-    padding: 12px 25px;
+    padding: 14px 25px;
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 0.4px;
+    line-height: 1em;
+    border-radius: 8px;
     cursor: pointer;
     &--primary {
         background-color: var(--color-primary);
-        color: var(--color-white);
+        color: white;
     }
 }

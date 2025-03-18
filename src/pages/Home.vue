@@ -1,195 +1,341 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import useFetch from "../composables/useFetch";
-import { useRouter } from "vue-router";
 import DOMPurify from "dompurify";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
-const data = ref([]);
-const loading = ref(true);
-const error = ref(null);
+const postData = ref([]);
+const postLoading = ref(true);
+const postError = ref(false);
+const categoryData = ref([]);
+const categoryLoading = ref(true);
+const categoryError = ref(false);
+let limit = 10;
+const currentPage = ref(1);
+const totalPage = ref(null);
+
+const cleanDOM = (html) => DOMPurify.sanitize(html);
+
 function handleNavigation(id) {
     router.push({ name: "SingleBlog", params: { id } });
+}
+watch(currentPage, () => {
+    useFetch({
+        link: `https://demo-themewinter.com/digiqole/wp-json/wp/v2/posts?_embed&per_page=${limit}&page=${currentPage.value}`,
+        data: postData,
+        loading: postLoading,
+        error: postError,
+        totalPage,
+    });
+});
+function loadMore() {
+    currentPage.value++;
 }
 
 onMounted(() => {
     useFetch({
-        link: "https://lifehacking.kicker.axiomthemes.com/wp-json/wp/v2/posts?_embed",
-        data,
-        loading,
-        error,
+        link: `https://demo-themewinter.com/digiqole/wp-json/wp/v2/posts?_embed&per_page=${limit}&page=${currentPage.value}`,
+        data: postData,
+        loading: postLoading,
+        error: postError,
+        totalPage,
+    });
+    useFetch({
+        link: `https://demo-themewinter.com/digiqole/wp-json/wp/v2/categories`,
+        data: categoryData,
+        loading: categoryLoading,
+        error: categoryError,
     });
 
     setTimeout(() => {
-        console.log(data.value[0]);
+        console.log(totalPage.value);
     }, 2000);
 });
-
-const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
-};
-
-const sanitizeHTML = (html) => DOMPurify.sanitize(html);
 </script>
 
 <template>
-    <section id="hero" class="hero">
-        <div class="container">
-            <div class="hero__data">
-                <h1 class="hero__title">
+    <section class="hero">
+        <div class="hero__container container">
+            <div class="hero__content">
+                <h1 class="hero__heading">
                     Heartfelt Reflections: Stories of Love, Loss, and Growth
                 </h1>
-                <p class="description" v-if="data.length > 0"></p>
+                <p class="hero__subheading">
+                    Revision Welcomes to ultimate source for fresh perspectives!
+                    Explore curated content to enlighten, entertain and engage
+                    global readers.
+                </p>
             </div>
         </div>
     </section>
-
-    <section class="category">
-        <div class="container">
-            <div class="category__data">Here some category</div>
+    <section class="topics">
+        <div class="container topics__container">
+            <div class="topics__data">
+                <h5 class="topics__heading">Recommend for you:</h5>
+                <div v-if="categoryLoading" class="loader-wrapper">
+                    <div class="loader"></div>
+                </div>
+                <ul v-if="!categoryLoading" class="topics__list-wrapper">
+                    <li
+                        v-for="category in categoryData"
+                        :key="category.id"
+                        class="topics__list-item"
+                    >
+                        <span class="topics__list-item__icon">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M14 18V20L16 21V22H8L7.99639 21.0036L10 20V18H2.9918C2.44405 18 2 17.5511 2 16.9925V4.00748C2 3.45107 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44892 22 4.00748V16.9925C22 17.5489 21.5447 18 21.0082 18H14ZM4 14V16H20V14H4Z"
+                                ></path>
+                            </svg>
+                        </span>
+                        <span class="topics__list-item__title">
+                            {{ category.name }}
+                        </span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </section>
-
-    <section class="posts">
-        <div class="container">
-            <div v-if="loading" class="loader"></div>
-            <div v-if="error" class="error error--message"></div>
-            <div class="posts__data" v-if="!loading">
+    <section class="content">
+        <div class="container content__container">
+            <div
+                v-if="postLoading && postData.length < 1"
+                class="loader-wrapper"
+            >
+                <div class="loader"></div>
+            </div>
+            <div v-if="postError" class="error error--message"></div>
+            <div v-if="postData.length > 0" class="content__data">
                 <article
-                    @click="handleNavigation(post.id)"
-                    class="posts__post post"
-                    v-for="post in data"
+                    v-for="post in postData"
                     :key="post.id"
+                    class="content__post post"
                 >
                     <div class="post__image">
                         <img
                             :src="
                                 post._embedded?.['wp:featuredmedia']?.[0]
-                                    ?.media_details?.sizes?.['kicker-thumb-med']
+                                    ?.media_details?.sizes?.['digiqole-medium']
                                     ?.source_url
                             "
-                            alt="Post image"
+                            alt=""
                         />
                     </div>
                     <div class="post__content">
-                        <div class="post__categories">
-                            <span class="post__category">
-                                {{ post._embedded["wp:term"][0][0].name }}
-                            </span>
+                        <div class="post__category">
+                            {{ post._embedded["wp:term"][0][0].name }}
                         </div>
-                        <h4
-                            @click="handleNavigation(post.id)"
-                            class="post__title"
-                        >
-                            {{ post.title.rendered }}
-                        </h4>
+                        <h4 class="post__title">{{ post.title.rendered }}</h4>
                         <div class="post__meta">
-                            <div class="post__author">
-                                {{ post._embedded.author[0].name }}
-                            </div>
-                            <div class="post__date">
-                                {{ (formatDate(post.date), post.id) }}
-                            </div>
+                            <span class="post__meta-name">
+                                By
+                                <span>{{ post._embedded.author[0].name }}</span>
+                            </span>
+                            <span class="post__meta-date">20 Jan 2020</span>
                         </div>
                         <p
-                            class="post__excerpt"
-                            v-html="sanitizeHTML(post.excerpt.rendered)"
+                            class="post__description"
+                            v-html="cleanDOM(post.excerpt.rendered)"
                         ></p>
-                        <p></p>
-                        <a href="#" class="btn btn--primary">Read more</a>
+                        <button
+                            type="button"
+                            class="btn btn--primary"
+                            @click="handleNavigation(post.id)"
+                        >
+                            read more
+                        </button>
                     </div>
                 </article>
+                <div v-if="postLoading" class="loader-wrapper">
+                    <div class="loader"></div>
+                </div>
+                <div class="content__pagination">
+                    <button
+                        v-if="currentPage < totalPage && !postLoading"
+                        type="button"
+                        class="btn btn--primary"
+                        @click="loadMore"
+                    >
+                        View more...
+                    </button>
+                </div>
             </div>
-            <aside class="posts__sidebar"></aside>
+
+            <aside class="content__sidebar"></aside>
         </div>
     </section>
 </template>
 
 <style lang="scss" scoped>
-.error {
-    position: relative;
-    display: inline-block;
-    text-align: center;
-    color: rgb(199, 0, 0);
-    font-size: 15px;
-    font-weight: 400;
-    background-color: rgb(255, 216, 216);
-    padding: 10px 20px;
-    border-radius: 4px;
-    &--message {
-        &::before {
-            content: "Opps! There is an error occurred. Data can not be loaded";
-        }
-    }
+@use "../styles/utils" as u;
 
-    &--indicator::after {
-        content: "";
-        position: absolute;
-        display: block;
-        width: 20px;
-        height: 20px;
-        background-color: rgb(255, 216, 216);
-        top: -6px;
-        left: 10px;
-        z-index: -1;
-        rotate: -45deg;
-        border-radius: 3px;
+.hero {
+    padding-block: 3em;
+    &__container {
+        min-height: 10vh;
+        justify-content: center;
+        align-items: center;
+        .hero__content {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid var(--color-border);
+            padding-block-end: 2em;
+            .hero__subheading,
+            .hero__heading {
+                text-align: center;
+            }
+
+            .hero__heading {
+                font-size: var(--fs-2xl);
+            }
+        }
     }
 }
 
-.container {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: minmax(0, 1fr) 370px;
+.topics {
+    &__data {
+        display: flex;
+        width: 100%;
+        flex-flow: column;
+        justify-content: center;
+        gap: 40px;
+    }
 
-    .posts {
-        &__data {
-            --item-gap: 30px;
-            display: grid;
-            gap: var(--item-gap);
+    &__heading {
+        text-align: center;
+        text-transform: uppercase;
+        color: var(--color-subheading);
+    }
+    &__list-wrapper {
+        width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+    &__list-item {
+        background-color: var(--color-white);
+        padding: 10px 20px;
+        border-radius: 50px;
+        display: block;
+        box-shadow: 0 5px 25px 0 rgba(21, 33, 56, 0.074);
+        cursor: pointer;
+        &__icon svg {
+            vertical-align: middle;
+            width: 24px;
+            height: auto;
+            margin-right: 10px;
         }
-        &__post {
-            width: 100%;
-            --gap: 1.25rem;
-            display: grid;
-            grid-template-columns: 350px calc(100% - 350px - var(--gap));
-            gap: var(--gap);
+        &__title {
+            font-weight: 600;
+            line-height: 1em;
+            color: var(--color-heading);
+        }
+    }
+}
 
+.content {
+    padding-top: var(--space-l-xl);
+    --gap: 30px;
+    &__container {
+        flex-flow: row;
+    }
+
+    &__data {
+        display: grid;
+        gap: var(--gap);
+        width: calc(100% - 360px);
+        .post {
+            display: grid;
+            grid-template-columns: 46% 1fr;
+            gap: var(--gap);
             &:not(&:first-child) {
-                padding-top: var(--item-gap);
+                padding-top: var(--gap);
                 border-top: 1px solid var(--color-border);
             }
+            &__content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                justify-content: center;
+                align-items: flex-start;
+            }
+            &__category {
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                color: var(--color-subheading);
+            }
 
-            .post__excerpt {
+            &__image {
+                img {
+                    border-radius: 10px;
+                    overflow: hidden;
+                    width: 100%;
+                    object-fit: cover;
+                    aspect-ratio: 5/3;
+                }
+            }
+
+            &__meta {
+                display: flex;
+                gap: 10px;
+                width: 100%;
+                font-size: 12px;
+                text-transform: uppercase;
+                font-weight: 600;
+                color: var(--color-subheading);
+                &-name span {
+                    color: var(--color-heading);
+                }
+            }
+
+            &__description {
                 display: -webkit-box;
                 line-clamp: 2;
                 -webkit-line-clamp: 2; // Limit to 2 lines
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                max-height: 3em; // Approximate height for 2 lines
-                line-height: 1.5em; // Adjust based on font-size
             }
+        }
+    }
 
-            .post__image {
-                background-color: rgb(222, 222, 222);
-            }
+    &__sidebar {
+        width: 360px;
+    }
+}
+
+@include u.respond-to("lg") {
+    .content {
+        &__data {
+            width: 100%;
+        }
+        &__sidebar {
+            width: 0;
+            display: none;
         }
     }
 }
 
-@media only screen and (max-width: 1024px) {
-    .container {
-        grid-template-columns: minmax(0, 1fr);
-    }
-    aside {
-        display: none;
+@include u.respond-to("sm") {
+    .content {
+        &__data {
+            gap: 30px;
+        }
+        .post {
+            grid-template-columns: 1fr;
+        }
     }
 }
 </style>
